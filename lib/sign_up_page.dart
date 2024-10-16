@@ -204,8 +204,8 @@ class _SignUpPageState extends State<SignUpPage> {
               suffixIcon: toggleVisibility != null
                   ? IconButton(
                 icon: Icon(
-                  isObscure ? Icons.visibility_off : Icons.visibility,
-                  color: const Color(0xFFC03B7C), // Eye icon color
+                  isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                  color: const Color(0xFF8a8a8a), // Eye icon color
                 ),
                 onPressed: toggleVisibility,
               )
