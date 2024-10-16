@@ -1,5 +1,6 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -12,14 +13,85 @@ class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
   String _name = '';
   String _email = '';
-  String _password = '';
-  String _confirmPassword = '';
   String? _nameError;
   String? _emailError;
   String? _passwordError;
   String? _confirmPasswordError;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _emailController.addListener(_validateEmail);
+    _passwordController.addListener(_validatePassword);
+    _confirmPasswordController.addListener(_validateConfirmPassword);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  void _validateEmail() {
+    if(_emailController.text.isEmpty) {
+      setState(() {
+        _emailError = 'Please enter your email';
+      });
+    } else if(!EmailValidator.validate(_emailController.text)) {
+      setState(() {
+        _emailError = 'Please enter a valid email';
+      });
+    } else {
+      setState(() {
+        _emailError = null;
+      });
+    }
+  }
+
+  void _validatePassword() {
+    if (_passwordController.text.isEmpty) {
+      setState(() {
+        _passwordError = 'Please enter your password';
+      });
+    } else if (_passwordController.text.length < 6) {
+      setState(() {
+        _passwordError = 'Password must be at least 6 characters';
+      });
+    } else {
+      setState(() {
+        _passwordError = null;
+      });
+    }
+  }
+
+  void _validateConfirmPassword() {
+    if (_confirmPasswordController.text.isEmpty) {
+      setState(() {
+        _confirmPasswordError = 'Please confirm your password';
+      });
+    } else if (_confirmPasswordController.text != _passwordController.text) {
+      setState(() {
+        _confirmPasswordError = 'Passwords do not match';
+      });
+    } else {
+      setState(() {
+        _confirmPasswordError = null;
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -32,25 +104,26 @@ class _SignUpPageState extends State<SignUpPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              SizedBox(height: 44),
-              Text(
+              const SizedBox(height: 44),
+              const Text(
                 "Let's Get Started",
                 style: TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
+              const Text(
                 'Enter Your Details',
                 style: TextStyle(
                   fontSize: 18,
                   color: Color(0xFF8A8A8A),
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               _buildTextField(
                 hintText: 'Name',
                 isObscure: false,
+                controller: _nameController,
                 onSaved: (value) => _name = value ?? '',
                 errorText: _nameError,
                 validator: (value) {
@@ -67,10 +140,11 @@ class _SignUpPageState extends State<SignUpPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               _buildTextField(
                 hintText: 'E-mail',
                 isObscure: false,
+                controller: _emailController,
                 onSaved: (value) => _email = value ?? '',
                 errorText: _emailError,
                 validator: (value) {
@@ -92,7 +166,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               _buildTextField(
                 hintText: 'Password',
                 isObscure: !_isPasswordVisible,
@@ -101,28 +175,15 @@ class _SignUpPageState extends State<SignUpPage> {
                     _isPasswordVisible = !_isPasswordVisible;
                   });
                 },
-                onSaved: (value) => _password = value ?? '',
+                controller: _passwordController,
+                onSaved: (value) => _passwordController.text = value ?? '',
                 errorText: _passwordError,
                 validator: (value) {
-                  if (value!.isEmpty) {
-                    setState(() {
-                      _passwordError = 'Please enter your password';
-                    });
-                    return '';
-                  } else if (value.length < 6) {
-                    setState(() {
-                      _passwordError = 'Password must be at least 6 characters';
-                    });
-                    return '';
-                  } else {
-                    setState(() {
-                      _passwordError = null;
-                    });
-                  }
                   return null;
                 },
+                inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               _buildTextField(
                 hintText: 'Confirm Password',
                 isObscure: !_isConfirmPasswordVisible,
@@ -131,34 +192,21 @@ class _SignUpPageState extends State<SignUpPage> {
                     _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
                   });
                 },
-                onSaved: (value) => _confirmPassword = value ?? '',
+                controller: _confirmPasswordController,
+                onSaved: (value) => _confirmPasswordController.text = value ?? '',
                 errorText: _confirmPasswordError,
                 validator: (value) {
-                  if (value!.isEmpty) {
-                    setState(() {
-                      _confirmPasswordError = 'Please confirm your password';
-                    });
-                    return '';
-                  } else if (value != _password) {
-                    setState(() {
-                      _confirmPasswordError = 'Password does not match';
-                    });
-                    return '';
-                  } else {
-                    setState(() {
-                      _confirmPasswordError = null;
-                    });
-                  }
                   return null;
                 },
+                inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               _buildSignUpButton(),
-              SizedBox(height: 52),
+              const SizedBox(height: 52),
               _buildOrDivider(),
-              SizedBox(height: 36),
+              const SizedBox(height: 36),
               _buildSocialMediaBoxes(),
-              SizedBox(height: 66),
+              const SizedBox(height: 66),
               _buildAccountSection(),
             ],
           ),
@@ -170,47 +218,61 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _buildTextField({
     required String hintText,
     required bool isObscure,
+    required TextEditingController controller,
     required Function(String?)? onSaved,
     required String? errorText,
     required String? Function(String?)? validator,
     VoidCallback? toggleVisibility,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (errorText != null) // Show error message if present
-          Text(
-            errorText,
-            style: const TextStyle(color: Colors.red, fontSize: 12),
-          ),
-        const SizedBox(height: 4), // Space between error text and text field
-        Container(
-          width: 366,
-          height: 60,
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFC03B7C)), // Border color
-            borderRadius: BorderRadius.circular(17), // Border radius
-          ),
-          child: TextFormField(
-            obscureText: isObscure,
-            onSaved: onSaved,
-            validator: validator,
-            style: const TextStyle(color: Colors.black), // Text color
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: hintText, // Placeholder text
-              hintStyle: const TextStyle(color: Color(0xFF8A8A8A)), // Hint text color
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), // Center hint text vertically
-              suffixIcon: toggleVisibility != null
-                  ? IconButton(
-                icon: Icon(
-                  isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                  color: const Color(0xFF8a8a8a), // Eye icon color
-                ),
-                onPressed: toggleVisibility,
-              )
-                  : null,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4), // Add space below the error message
+            child: Text(
+              errorText,
+              style: const TextStyle(color: Colors.red, fontSize: 12),
             ),
+          ),
+        TextFormField(
+          obscureText: isObscure,
+          controller: controller,
+          onSaved: onSaved,
+          validator: validator,
+          autocorrect: false,
+          enableSuggestions: false,
+          inputFormatters: inputFormatters,
+          style: const TextStyle(color: Colors.black), // Text color
+          decoration: InputDecoration(
+            hintText: hintText, // Placeholder text
+            hintStyle: const TextStyle(color: Color(0xFF8A8A8A)), // Hint text color
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 20.0, // Keeps the hint text vertically centered
+              horizontal: 16.0,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(17),
+              borderSide: const BorderSide(color: Color(0xFFC03B7C)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(17),
+              borderSide: const BorderSide(color: Color(0xFFC03B7C)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(17),
+              borderSide: const BorderSide(color: Color(0xFFC03B7C)),
+            ),
+            suffixIcon: toggleVisibility != null
+                ? IconButton(
+              icon: Icon(
+                isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                color: const Color(0xFF8a8a8a), // Eye icon color
+              ),
+              onPressed: toggleVisibility,
+            )
+                : null, // Only show the icon for password fields
           ),
         ),
       ],
