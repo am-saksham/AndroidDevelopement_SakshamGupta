@@ -44,3 +44,6 @@ app.*.map.json
 
 # Exclude files starting with ._
 ._*
+
+# Ignore environment variable files
+.env
