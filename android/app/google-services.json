@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "354826495761",
+    "project_id": "android-development-task-round",
+    "storage_bucket": "android-development-task-round.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:354826495761:android:f0caec5cb9fd4ac3070eb0",
+        "android_client_info": {
+          "package_name": "com.example.task_round"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4Bu3fCYWSNzPTObIsM5M_5rnhdmKcoUI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

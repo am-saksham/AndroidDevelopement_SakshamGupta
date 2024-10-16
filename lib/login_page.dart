@@ -1,11 +1,14 @@
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:task_round/forgot_password_page.dart';
+import 'package:task_round/home_page.dart';
 import 'package:task_round/sign_up_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final bool clearFields;
+  const LoginPage({Key? key, this.clearFields = false}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -24,6 +27,12 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.clearFields) {
+        _emailController.clear();
+        _passwordController.clear();
+      }
+    });
     _emailController.addListener(_validateEmail);
     _passwordController.addListener(_validatePassword);
   }
@@ -67,6 +76,27 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> _login() async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text.trim(), password: _passwordController.text.trim());
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
+    } on FirebaseAuthException catch(e) {
+      if(e.code == 'user-not-found') {
+        setState(() {
+          _emailError = 'No user found for that email.';
+        });
+      } else if(e.code == 'wrong-password') {
+        setState(() {
+          _passwordError = 'Wrong password provided for that user.';
+        });
+      } else {
+        setState(() {
+          _emailError = 'An error occurred. Please try again.';
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,124 +111,123 @@ class _LoginPageState extends State<LoginPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height, // Full screen height
-          ),
-          child: IntrinsicHeight(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 20),
-                const Center(
-                  child: Text(
-                    'Login',
-                    style: TextStyle(
-                      fontSize: 23,
-                      fontWeight: FontWeight.w900,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+      body: SingleChildScrollView(
+        child: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height, // Full screen height
                 ),
-                const Center(
-                  child: Text(
-                    'Enter Your Credentials',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Color(0xFF8A8A8A),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Form(
-                  key: _formKey,
+                child: IntrinsicHeight(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _buildTextField(
-                        hintText: 'E-mail',
-                        isObscure: false,
-                        controller: _emailController,
-                        errorText: _emailError,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            setState(() {
-                              _emailError = 'Please enter your email';
-                            });
-                            return '';
-                          } else if (!EmailValidator.validate(value)) {
-                            setState(() {
-                              _emailError = 'Please enter a valid email';
-                            });
-                            return '';
-                          } else {
-                            setState(() {
-                              _emailError = null;
-                            });
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 18),
-                      _buildTextField(
-                        hintText: 'Password',
-                        isObscure: !_isPasswordVisible,
-                        toggleVisibility: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
-                        controller: _passwordController,
-                        errorText: _passwordError,
-                        validator: (value) {
-                          return null;
-                        },
-                        inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
-                      ),
-                      const SizedBox(height: 14),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPasswordPage()));
-                          },
-                          child: const Text(
-                            'Forgot Password?',
-                            style: TextStyle(
-                              color: Color(0xFFC03B7C),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Color(0xFFC03B7C),
-                            ),
+                      const SizedBox(height: 20),
+                      const Center(
+                        child: Text(
+                          'Login',
+                          style: TextStyle(
+                            fontSize: 23,
+                            fontWeight: FontWeight.w900,
                           ),
+                          textAlign: TextAlign.center,
                         ),
-                      )
+                      ),
+                      const Center(
+                        child: Text(
+                          'Enter Your Credentials',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Color(0xFF8A8A8A),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            _buildTextField(
+                              hintText: 'E-mail',
+                              isObscure: false,
+                              controller: _emailController,
+                              errorText: _emailError,
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  setState(() {
+                                    _emailError = 'Please enter your email';
+                                  });
+                                  return '';
+                                } else if (!EmailValidator.validate(value)) {
+                                  setState(() {
+                                    _emailError = 'Please enter a valid email';
+                                  });
+                                  return '';
+                                } else {
+                                  setState(() {
+                                    _emailError = null;
+                                  });
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 18),
+                            _buildTextField(
+                              hintText: 'Password',
+                              isObscure: !_isPasswordVisible,
+                              toggleVisibility: () {
+                                setState(() {
+                                  _isPasswordVisible = !_isPasswordVisible;
+                                });
+                              },
+                              controller: _passwordController,
+                              errorText: _passwordError,
+                              validator: (value) {
+                                return null;
+                              },
+                              inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
+                            ),
+                            const SizedBox(height: 14),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPasswordPage()));
+                                },
+                                child: const Text(
+                                  'Forgot Password?',
+                                  style: TextStyle(
+                                    color: Color(0xFFC03B7C),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Color(0xFFC03B7C),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      _buildLoginButton(),
+                      const SizedBox(height: 52),
+                      _buildOrDivider(),
+                      const SizedBox(height: 36),
+                      _buildSocialMediaBoxes(),
+                      const SizedBox(height: 28),
+                      _buildAccountSection(),
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
-                const SizedBox(height: 30),
-                _buildLoginButton(),
-                const SizedBox(height: 52),
-                _buildOrDivider(),
-                const SizedBox(height: 36),
-                _buildSocialMediaBoxes(),
-                const SizedBox(height: 36),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildAccountSection(),
-                        const SizedBox(height: 40), // Padding from bottom
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -270,7 +299,7 @@ class _LoginPageState extends State<LoginPage> {
       child: ElevatedButton(
         onPressed: () {
           if (_formKey.currentState!.validate()) {
-            // Save and submit login form data
+            _login();
           } else {
             _validateEmail();
             _validatePassword();

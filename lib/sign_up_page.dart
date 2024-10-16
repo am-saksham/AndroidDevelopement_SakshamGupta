@@ -1,6 +1,8 @@
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:task_round/home_page.dart';
 import 'package:task_round/login_page.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -14,6 +16,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -128,117 +132,122 @@ class _SignUpPageState extends State<SignUpPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
         ),
       ),
-      body: SingleChildScrollView( // Make the body scrollable
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const Text(
-                "Let's Get Started",
-                style: TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.w900,
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: SingleChildScrollView( // Make the body scrollable
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const Text(
+                  "Let's Get Started",
+                  style: TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
-              ),
-              const Text(
-                'Enter Your Details',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Color(0xFF8A8A8A),
+                const Text(
+                  'Enter Your Details',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Color(0xFF8A8A8A),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              _buildTextField(
-                hintText: 'Name',
-                isObscure: false,
-                controller: _nameController,
-                onSaved: (value) => _name = value ?? '',
-                errorText: _nameError,
-                validator: (value) {
-                  if (value!.isEmpty) {
+                const SizedBox(height: 30),
+                _buildTextField(
+                  hintText: 'Name',
+                  isObscure: false,
+                  controller: _nameController,
+                  onSaved: (value) => _name = value ?? '',
+                  errorText: _nameError,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      setState(() {
+                        _nameError = 'Please enter your name';
+                      });
+                      return '';
+                    } else {
+                      setState(() {
+                        _nameError = null;
+                      });
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 18),
+                _buildTextField(
+                  hintText: 'E-mail',
+                  isObscure: false,
+                  controller: _emailController,
+                  onSaved: (value) => _email = value ?? '',
+                  errorText: _emailError,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      setState(() {
+                        _emailError = 'Please enter your email';
+                      });
+                      return '';
+                    } else if (!EmailValidator.validate(value)) {
+                      setState(() {
+                        _emailError = 'Please enter a valid email';
+                      });
+                      return '';
+                    } else {
+                      setState(() {
+                        _emailError = null;
+                      });
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 18),
+                _buildTextField(
+                  hintText: 'Password',
+                  isObscure: !_isPasswordVisible,
+                  toggleVisibility: () {
                     setState(() {
-                      _nameError = 'Please enter your name';
+                      _isPasswordVisible = !_isPasswordVisible;
                     });
-                    return '';
-                  } else {
+                  },
+                  controller: _passwordController,
+                  onSaved: (value) => _passwordController.text = value ?? '',
+                  errorText: _passwordError,
+                  validator: (value) {
+                    return null;
+                  },
+                  inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
+                ),
+                const SizedBox(height: 18),
+                _buildTextField(
+                  hintText: 'Confirm Password',
+                  isObscure: !_isConfirmPasswordVisible,
+                  toggleVisibility: () {
                     setState(() {
-                      _nameError = null;
+                      _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
                     });
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 18),
-              _buildTextField(
-                hintText: 'E-mail',
-                isObscure: false,
-                controller: _emailController,
-                onSaved: (value) => _email = value ?? '',
-                errorText: _emailError,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    setState(() {
-                      _emailError = 'Please enter your email';
-                    });
-                    return '';
-                  } else if (!EmailValidator.validate(value)) {
-                    setState(() {
-                      _emailError = 'Please enter a valid email';
-                    });
-                    return '';
-                  } else {
-                    setState(() {
-                      _emailError = null;
-                    });
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 18),
-              _buildTextField(
-                hintText: 'Password',
-                isObscure: !_isPasswordVisible,
-                toggleVisibility: () {
-                  setState(() {
-                    _isPasswordVisible = !_isPasswordVisible;
-                  });
-                },
-                controller: _passwordController,
-                onSaved: (value) => _passwordController.text = value ?? '',
-                errorText: _passwordError,
-                validator: (value) {
-                  return null;
-                },
-                inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
-              ),
-              const SizedBox(height: 18),
-              _buildTextField(
-                hintText: 'Confirm Password',
-                isObscure: !_isConfirmPasswordVisible,
-                toggleVisibility: () {
-                  setState(() {
-                    _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-                  });
-                },
-                controller: _confirmPasswordController,
-                onSaved: (value) => _confirmPasswordController.text = value ?? '',
-                errorText: _confirmPasswordError,
-                validator: (value) {
-                  return null;
-                },
-                inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
-              ),
-              const SizedBox(height: 30),
-              _buildSignUpButton(),
-              const SizedBox(height: 52),
-              _buildOrDivider(),
-              const SizedBox(height: 36),
-              _buildSocialMediaBoxes(),
-              const SizedBox(height: 66),
-              _buildAccountSection(),
-            ],
+                  },
+                  controller: _confirmPasswordController,
+                  onSaved: (value) => _confirmPasswordController.text = value ?? '',
+                  errorText: _confirmPasswordError,
+                  validator: (value) {
+                    return null;
+                  },
+                  inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
+                ),
+                const SizedBox(height: 30),
+                _buildSignUpButton(),
+                const SizedBox(height: 52),
+                _buildOrDivider(),
+                const SizedBox(height: 36),
+                _buildSocialMediaBoxes(),
+                const SizedBox(height: 66),
+                _buildAccountSection(),
+              ],
+            ),
           ),
         ),
       ),
@@ -314,9 +323,22 @@ class _SignUpPageState extends State<SignUpPage> {
       width: 366,
       height: 60,
       child: ElevatedButton(
-        onPressed: () {
+        onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            // Save and submit form data
+            try {
+              UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: _emailController.text.trim(), password: _passwordController.text.trim());
+              Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+            } on FirebaseAuthException catch(e) {
+              setState(() {
+                if(e.code == 'weak-password') {
+                  _passwordError = 'The password provided is too weak.';
+                } else if(e.code == 'email-already-in-use') {
+                  _emailError = 'The account already exists for that email.';
+                } else {
+                  _emailError = 'An error occurred. Please try again.';
+                }
+              });
+            }
           } else {
             _validateName();
             _validateEmail();
