@@ -104,7 +104,7 @@ class _SignUpPageState extends State<SignUpPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(height: 44),
+              const SizedBox(height: 50),
               const Text(
                 "Let's Get Started",
                 style: TextStyle(
