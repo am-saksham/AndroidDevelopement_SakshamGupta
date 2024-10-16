@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:task_round/forgot_password_page.dart';
+import 'package:task_round/login_page.dart';
+import 'package:task_round/new_password_page.dart';
 import 'package:task_round/sign_up_page.dart';
+import 'package:task_round/verify_code_page.dart';
 
 void main() {
   runApp(const MyApp());

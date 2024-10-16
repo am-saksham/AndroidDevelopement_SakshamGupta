@@ -1,6 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:task_round/login_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -29,7 +30,8 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   void initState() {
     super.initState();
-
+    
+    _nameController.addListener(_validateName);
     _emailController.addListener(_validateEmail);
     _passwordController.addListener(_validatePassword);
     _confirmPasswordController.addListener(_validateConfirmPassword);
@@ -44,12 +46,28 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
 
+  void _validateName() {
+    if (_nameController.text.isEmpty) {
+      setState(() {
+        _nameError = 'Please enter your name';
+      });
+    } else if (_nameController.text.length < 2) {
+      setState(() {
+        _nameError = 'Name must be at least 2 characters';
+      });
+    } else {
+      setState(() {
+        _nameError = null;
+      });
+    }
+  }
+
   void _validateEmail() {
-    if(_emailController.text.isEmpty) {
+    if (_emailController.text.isEmpty) {
       setState(() {
         _emailError = 'Please enter your email';
       });
-    } else if(!EmailValidator.validate(_emailController.text)) {
+    } else if (!EmailValidator.validate(_emailController.text)) {
       setState(() {
         _emailError = 'Please enter a valid email';
       });
@@ -60,6 +78,7 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
+  // Real-time password validation
   void _validatePassword() {
     if (_passwordController.text.isEmpty) {
       setState(() {
@@ -76,6 +95,7 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
+  // Real-time confirm password validation
   void _validateConfirmPassword() {
     if (_confirmPasswordController.text.isEmpty) {
       setState(() {
@@ -93,10 +113,21 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+        ),
+      ),
       body: SingleChildScrollView( // Make the body scrollable
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -104,12 +135,11 @@ class _SignUpPageState extends State<SignUpPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(height: 50),
               const Text(
                 "Let's Get Started",
                 style: TextStyle(
                   fontSize: 23,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
               const Text(
@@ -280,31 +310,33 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget _buildSignUpButton() {
-    return Container(
+    return SizedBox(
       width: 366,
       height: 60,
-      decoration: BoxDecoration(
-        color: const Color(0xFFC03B7C),
-        borderRadius: BorderRadius.circular(17),
-      ),
       child: ElevatedButton(
         onPressed: () {
           if (_formKey.currentState!.validate()) {
-            _formKey.currentState!.save();
+            // Save and submit form data
+          } else {
+            _validateName();
+            _validateEmail();
+            _validatePassword();
+            _validateConfirmPassword();
           }
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(17),
           ),
+          backgroundColor: const Color(0xFFC03B7C),
+          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 128),
         ),
         child: const Text(
           'Sign Up',
           style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
             color: Colors.white,
-            fontSize: 18,
           ),
         ),
       ),
@@ -381,7 +413,7 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
         GestureDetector(
           onTap: () {
-            // Navigate to the Login Page
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
           },
           child: const Text(
             "Login",
