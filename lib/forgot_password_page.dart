@@ -1,6 +1,9 @@
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'login_page.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -39,6 +42,22 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       setState(() {
         _emailError = null;
       });
+    }
+  }
+
+  Future<void> _sendVerficationCode() async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Verification code sent to your email!')),
+      );
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginPage(clearFields: true)), // Replace with your actual LoginPage widget
+      );
+    } on FirebaseAuthException catch(e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Error sending code')),
+      );
     }
   }
 
@@ -156,7 +175,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       child: ElevatedButton(
         onPressed: () {
           if (_formKey.currentState!.validate()) {
-            // Handle sending the code logic
+            _sendVerficationCode();
           } else {
             _validateEmail();
           }
