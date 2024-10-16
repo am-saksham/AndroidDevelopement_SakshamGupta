@@ -2,9 +2,15 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:task_round/forgot_password_page.dart';
 import 'package:task_round/home_page.dart';
 import 'package:task_round/sign_up_page.dart';
+
+import 'auth_service.dart';
+
+final GoogleSignIn _googleSignIn = GoogleSignIn();
+final AuthService _authService = AuthService();
 
 class LoginPage extends StatefulWidget {
   final bool clearFields;
@@ -17,6 +23,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -99,8 +108,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? const Color(0xFF121212) : Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -108,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: isDarkMode? Colors.white : Colors.black),
         ),
       ),
       body: SingleChildScrollView(
@@ -222,7 +232,7 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 36),
                       _buildSocialMediaBoxes(),
                       const SizedBox(height: 28),
-                      _buildAccountSection(),
+                      _buildAccountSection(isDarkMode),
                       const SizedBox(height: 40),
                     ],
                   ),
@@ -244,6 +254,7 @@ class _LoginPageState extends State<LoginPage> {
     VoidCallback? toggleVisibility,
     List<TextInputFormatter>? inputFormatters,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -260,7 +271,7 @@ class _LoginPageState extends State<LoginPage> {
           controller: controller,
           validator: validator,
           inputFormatters: inputFormatters,
-          style: const TextStyle(color: Colors.black),
+          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: const TextStyle(color: Color(0xFF8A8A8A)),
@@ -357,7 +368,28 @@ class _LoginPageState extends State<LoginPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildSocialMediaBox('assets/google_logo.png'),
+        GestureDetector(
+            onTap: () async {
+              UserCredential? userCredential = await _authService.loginWithGoogle();
+              if (userCredential != null) {
+                // Navigate to HomePage if login is successful
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const HomePage()),
+                );
+              } else {
+                // Show error message if login fails or is canceled
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content:
+                    Text('Google sign-in failed or was canceled'),
+                  ),
+                );
+              }
+            },
+            child: _buildSocialMediaBox('assets/google_logo.png')
+        ),
         const SizedBox(width: 15),
         _buildSocialMediaBox('assets/facebook_logo.png'),
         const SizedBox(width: 15),
@@ -382,17 +414,17 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildAccountSection() {
+  Widget _buildAccountSection(bool isDarkMode) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
+        Text(
           "Don't have an account? ",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500, fontSize: 14),
+          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500, fontSize: 14),
         ),
         GestureDetector(
           onTap: () {
-            Navigator.of(context).pop();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const SignUpPage()));
           },
           child: const Text(
             "Sign Up",

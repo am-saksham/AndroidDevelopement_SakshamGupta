@@ -2,9 +2,16 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:task_round/home_page.dart';
+
 import 'package:task_round/login_page.dart';
 
+import 'auth_service.dart';
+
+final GoogleSignIn _googleSignIn = GoogleSignIn();
+final AuthService _authService = AuthService();
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
@@ -18,6 +25,7 @@ class _SignUpPageState extends State<SignUpPage> {
   bool _isConfirmPasswordVisible = false;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -117,11 +125,11 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
 
-
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? const Color(0xFF121212) : Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -129,7 +137,7 @@ class _SignUpPageState extends State<SignUpPage> {
           onPressed: () {
 
           },
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: isDarkMode ? Colors.white : Colors.black),
         ),
       ),
       body: GestureDetector(
@@ -143,18 +151,19 @@ class _SignUpPageState extends State<SignUpPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Let's Get Started",
                   style: TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.w900,
+                      fontSize: 23,
+                      fontWeight: FontWeight.w900,
+                      color: isDarkMode ? Colors.white : Colors.black
                   ),
                 ),
-                const Text(
+                Text(
                   'Enter Your Details',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Color(0xFF8A8A8A),
+                      color: isDarkMode ? Colors.white54 : Colors.black54,
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -239,13 +248,13 @@ class _SignUpPageState extends State<SignUpPage> {
                   inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
                 ),
                 const SizedBox(height: 30),
-                _buildSignUpButton(),
+                _buildSignUpButton(isDarkMode),
                 const SizedBox(height: 52),
-                _buildOrDivider(),
+                _buildOrDivider(isDarkMode),
                 const SizedBox(height: 36),
-                _buildSocialMediaBoxes(),
+                _buildSocialMediaBoxes(isDarkMode),
                 const SizedBox(height: 66),
-                _buildAccountSection(),
+                _buildAccountSection(isDarkMode),
               ],
             ),
           ),
@@ -264,6 +273,7 @@ class _SignUpPageState extends State<SignUpPage> {
     VoidCallback? toggleVisibility,
     List<TextInputFormatter>? inputFormatters,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -283,7 +293,7 @@ class _SignUpPageState extends State<SignUpPage> {
           autocorrect: false,
           enableSuggestions: false,
           inputFormatters: inputFormatters,
-          style: const TextStyle(color: Colors.black), // Text color
+          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black), // Text color
           decoration: InputDecoration(
             hintText: hintText, // Placeholder text
             hintStyle: const TextStyle(color: Color(0xFF8A8A8A)), // Hint text color
@@ -318,7 +328,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _buildSignUpButton() {
+  Widget _buildSignUpButton(bool isDarkMode) {
     return SizedBox(
       width: 366,
       height: 60,
@@ -365,29 +375,29 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _buildOrDivider() {
-    return const Row(
+  Widget _buildOrDivider(bool isDarkMode) {
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Expanded(
           child: Divider(
-            color: Color(0xFF8A8A8A),
+            color: isDarkMode ? Colors.white54 : Colors.black54,
             thickness: 1,
           ),
         ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Text(
             'or',
             style: TextStyle(
-              color: Color(0xFF8A8A8A),
+              color: isDarkMode ? Colors.white54 : Colors.black54,
               fontSize: 18,
             ),
           ),
         ),
         Expanded(
           child: Divider(
-            color: Color(0xFF8A8A8A),
+            color: isDarkMode ? Colors.white54 : Colors.black54,
             thickness: 1,
           ),
         )
@@ -395,11 +405,33 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _buildSocialMediaBoxes() {
+  Widget _buildSocialMediaBoxes(bool isDarkMode) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildSocialMediaBox('assets/google_logo.png'),
+        GestureDetector(
+            onTap: () async {
+              UserCredential? userCredential = await _authService.loginWithGoogle();
+
+              if (userCredential != null) {
+                // Navigate to HomePage if login is successful
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const HomePage()),
+                );
+              } else {
+                // Show error message if login fails or is canceled
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content:
+                    Text('Google sign-in failed or was canceled'),
+                  ),
+                );
+              }
+            },
+            child: _buildSocialMediaBox('assets/google_logo.png')
+        ),
         const SizedBox(width: 15),
         _buildSocialMediaBox('assets/facebook_logo.png'),
         const SizedBox(width: 15),
@@ -425,13 +457,13 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _buildAccountSection() {
+  Widget _buildAccountSection(bool isDarkMode) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
+        Text(
           "Already have an account? ",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500,fontSize: 14),
+          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500,fontSize: 14),
         ),
         GestureDetector(
           onTap: () {

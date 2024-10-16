@@ -63,8 +63,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? const Color(0xFF121212) : Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -72,7 +73,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            icon: Icon(Icons.arrow_back, color: isDarkMode ? Colors.white : Colors.black),
         ),
       ),
       body: Container(
@@ -131,6 +132,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     required String? errorText,
     required String? Function(String?)? validator,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -145,7 +147,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         TextFormField(
           controller: controller,
           validator: validator,
-          style: const TextStyle(color: Colors.black),
+          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: const TextStyle(color: Color(0xFF8A8A8A)),

@@ -1,12 +1,11 @@
 // lib/home_page.dart
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:task_round/login_page.dart';
+import 'package:task_round/auth_service.dart'; // Import the AuthService
 
-class HomePage extends StatelessWidget {// You can pass user email or other data
-
+class HomePage extends StatelessWidget {
   const HomePage();
 
   @override
@@ -22,14 +21,20 @@ class HomePage extends StatelessWidget {// You can pass user email or other data
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),
-                onPressed: () async {
-                  await FirebaseAuth.instance.signOut();
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginPage(clearFields: true)),  // Pass clearFields as true
-                        (Route<dynamic> route) => false,
-                  );
-                }
+              onPressed: () async {
+                // Create an instance of AuthService
+                final AuthService authService = AuthService();
+
+                // Call signOut method
+                await authService.signOut();
+
+                // Navigate to LoginPage after signing out
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage(clearFields: true)),
+                      (Route<dynamic> route) => false,
+                );
+              },
             ),
           ],
         ),
