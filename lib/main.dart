@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:task_round/firebase_options.dart';
 import 'package:task_round/sign_up_page.dart';
+import 'package:task_round/splash_screen.dart';
 import 'package:task_round/wrapper.dart';
 
 Future<void> main() async {
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       themeMode: ThemeMode.system,
-      home: const Wrapper(),
+      home: const SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

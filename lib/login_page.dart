@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:task_round/forgot_password_page.dart';
 import 'package:task_round/home_page.dart';
@@ -138,22 +139,22 @@ class _LoginPageState extends State<LoginPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: 20),
-                      const Center(
+                      Center(
                         child: Text(
                           'Login',
-                          style: TextStyle(
+                          style: GoogleFonts.inter(
                             fontSize: 23,
                             fontWeight: FontWeight.w900,
                           ),
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      const Center(
+                      Center(
                         child: Text(
                           'Enter Your Credentials',
-                          style: TextStyle(
+                          style: GoogleFonts.inter(
                             fontSize: 18,
-                            color: Color(0xFF8A8A8A),
+                            color: const Color(0xFF8A8A8A),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -210,9 +211,9 @@ class _LoginPageState extends State<LoginPage> {
                                 onTap: () {
                                   Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPasswordPage()));
                                 },
-                                child: const Text(
+                                child: Text(
                                   'Forgot Password?',
-                                  style: TextStyle(
+                                  style: GoogleFonts.inter(
                                     color: Color(0xFFC03B7C),
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
@@ -271,7 +272,7 @@ class _LoginPageState extends State<LoginPage> {
           controller: controller,
           validator: validator,
           inputFormatters: inputFormatters,
-          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+          style: GoogleFonts.inter(color: isDarkMode ? Colors.white : Colors.black),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: const TextStyle(color: Color(0xFF8A8A8A)),
@@ -322,9 +323,9 @@ class _LoginPageState extends State<LoginPage> {
           ),
           backgroundColor: const Color(0xFFC03B7C),
         ),
-        child: const Text(
+        child: Text(
           'Login',
-          style: TextStyle(
+          style: GoogleFonts.inter(
             fontWeight: FontWeight.w600,
             fontSize: 16,
             color: Colors.white,
@@ -335,26 +336,26 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildOrDivider() {
-    return const Row(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Expanded(
+        const Expanded(
           child: Divider(
             color: Color(0xFF8A8A8A),
             thickness: 1,
           ),
         ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Text(
             'or',
-            style: TextStyle(
+            style: GoogleFonts.inter(
               color: Color(0xFF8A8A8A),
               fontSize: 18,
             ),
           ),
         ),
-        Expanded(
+        const Expanded(
           child: Divider(
             color: Color(0xFF8A8A8A),
             thickness: 1,
@@ -420,15 +421,15 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         Text(
           "Don't have an account? ",
-          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500, fontSize: 14),
+          style: GoogleFonts.inter(color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500, fontSize: 14),
         ),
         GestureDetector(
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const SignUpPage()));
           },
-          child: const Text(
+          child: Text(
             "Sign Up",
-            style: TextStyle(
+            style: GoogleFonts.inter(
               color: Color(0xFFC03B7C),
               fontWeight: FontWeight.bold,
               fontSize: 14,

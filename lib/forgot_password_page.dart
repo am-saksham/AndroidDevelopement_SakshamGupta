@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'login_page.dart';
 
@@ -82,22 +83,22 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 20),
-            const Center(
+            Center(
               child: Text(
                 'Forgot Password',
-                style: TextStyle(
+                style: GoogleFonts.inter(
                   fontSize: 23,
                   fontWeight: FontWeight.w900,
                 ),
                 textAlign: TextAlign.center,
               ),
             ),
-            const Center(
+            Center(
               child: Text(
                 'Don’t worry! Please enter the \nemail address linked with your account',
-                style: TextStyle(
+                style: GoogleFonts.inter(
                   fontSize: 16,
-                  color: Color(0xFF8A8A8A),
+                  color: const Color(0xFF8A8A8A),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -147,7 +148,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         TextFormField(
           controller: controller,
           validator: validator,
-          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+          style: GoogleFonts.inter(color: isDarkMode ? Colors.white : Colors.black),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: const TextStyle(color: Color(0xFF8A8A8A)),
@@ -188,9 +189,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
           backgroundColor: const Color(0xFFC03B7C),
         ),
-        child: const Text(
+        child: Text(
           'Send Code',
-          style: TextStyle(
+          style: GoogleFonts.inter(
             fontWeight: FontWeight.w600,
             fontSize: 16,
             color: Colors.white,

@@ -2,8 +2,10 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:task_round/get_started_page.dart';
 import 'package:task_round/home_page.dart';
 
 import 'package:task_round/login_page.dart';
@@ -135,7 +137,7 @@ class _SignUpPageState extends State<SignUpPage> {
         elevation: 0,
         leading: IconButton(
           onPressed: () {
-
+            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const GetStartedScreen()));
           },
           icon: Icon(Icons.arrow_back, color: isDarkMode ? Colors.white : Colors.black),
         ),
@@ -153,7 +155,7 @@ class _SignUpPageState extends State<SignUpPage> {
               children: [
                 Text(
                   "Let's Get Started",
-                  style: TextStyle(
+                  style: GoogleFonts.inter(
                       fontSize: 23,
                       fontWeight: FontWeight.w900,
                       color: isDarkMode ? Colors.white : Colors.black
@@ -161,7 +163,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 Text(
                   'Enter Your Details',
-                  style: TextStyle(
+                  style: GoogleFonts.inter(
                     fontSize: 18,
                       color: isDarkMode ? Colors.white54 : Colors.black54,
                   ),
@@ -293,7 +295,7 @@ class _SignUpPageState extends State<SignUpPage> {
           autocorrect: false,
           enableSuggestions: false,
           inputFormatters: inputFormatters,
-          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black), // Text color
+          style: GoogleFonts.inter(color: isDarkMode ? Colors.white : Colors.black), // Text color
           decoration: InputDecoration(
             hintText: hintText, // Placeholder text
             hintStyle: const TextStyle(color: Color(0xFF8A8A8A)), // Hint text color
@@ -363,9 +365,9 @@ class _SignUpPageState extends State<SignUpPage> {
           backgroundColor: const Color(0xFFC03B7C),
           padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 128),
         ),
-        child: const Text(
+        child: Text(
           'Sign Up',
-          style: TextStyle(
+          style: GoogleFonts.inter(
             fontWeight: FontWeight.w600,
             fontSize: 16,
             color: Colors.white,
@@ -389,7 +391,7 @@ class _SignUpPageState extends State<SignUpPage> {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Text(
             'or',
-            style: TextStyle(
+            style: GoogleFonts.inter(
               color: isDarkMode ? Colors.white54 : Colors.black54,
               fontSize: 18,
             ),
@@ -463,15 +465,15 @@ class _SignUpPageState extends State<SignUpPage> {
       children: [
         Text(
           "Already have an account? ",
-          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500,fontSize: 14),
+          style: GoogleFonts.inter(color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500,fontSize: 14),
         ),
         GestureDetector(
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
           },
-          child: const Text(
+          child: Text(
             "Login",
-            style: TextStyle(
+            style: GoogleFonts.inter(
               color: Color(0xFFC03B7C),
               fontWeight: FontWeight.bold,
               fontSize: 14,

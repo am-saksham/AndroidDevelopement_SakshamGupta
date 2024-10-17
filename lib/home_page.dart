@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:task_round/login_page.dart';
 import 'package:task_round/auth_service.dart'; // Import the AuthService
 
@@ -42,9 +43,9 @@ class HomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'Welcome!',
-                style: TextStyle(fontSize: 24),
+                style: GoogleFonts.inter(fontSize: 24),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
